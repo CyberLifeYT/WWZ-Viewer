@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "wwz-mapviewer"
+version = "0.1.0"
+description = "Read-only extractor for World War Z (Swarm Engine) map data, feeding a browser freecam viewer."
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    # Pak and 1SER parsing are stdlib-only; decoders and the probe use numpy.
+    "numpy>=2.0",
+    # Block-compressed (BC1-BC7) texture decoding.
+    "pillow>=11",
+    # Nearest light probes for millions of vertices (k-d tree).
+    "scipy>=1.14",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0"]
+
+[project.scripts]
+wwz-extract = "extractor.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["extractor*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

@@ -1,0 +1,10 @@
+# Copy this file to config/paths.toml and edit it for your machine.
+# config/paths.toml is git-ignored. Environment variables WWZ_CONTENT_DIR and
+# WWZ_OUTPUT_DIR override these values, and CLI flags override both.
+
+# The game's Content folder: the one that contains client/ and server/ with the .pak files.
+content_dir = "D:/Games/World War Z/Content"
+
+# Where raw dumps and exported map data are written. Relative paths resolve
+# against the project root.
+output_dir = "output"

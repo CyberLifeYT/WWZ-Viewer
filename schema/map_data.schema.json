@@ -1,0 +1,917 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "wwz-mapviewer/map_data",
+  "title": "Exported map manifest (map_data.json)",
+  "description": "Contract between the extractor (Step 1) and the viewer (Step 2). Binary buffers sit next to the manifest and are referenced by relative uri.",
+  "type": "object",
+  "required": [
+    "schema",
+    "schema_version",
+    "map",
+    "generator",
+    "source",
+    "coordinates",
+    "layers"
+  ],
+  "properties": {
+    "schema": {
+      "const": "wwz-mapviewer/map_data"
+    },
+    "schema_version": {
+      "const": 1
+    },
+    "map": {
+      "type": "string",
+      "description": "Scene pak name, e.g. ny_01_pvp."
+    },
+    "generator": {
+      "type": "object",
+      "required": [
+        "name",
+        "version"
+      ],
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        },
+        "build": {
+          "type": "string",
+          "description": "Digest of the extractor's source code; a resumed batch export skips maps whose build matches."
+        }
+      }
+    },
+    "source": {
+      "type": "object",
+      "required": [
+        "pak",
+        "side",
+        "entry"
+      ],
+      "properties": {
+        "pak": {
+          "type": "string"
+        },
+        "side": {
+          "enum": [
+            "client",
+            "server"
+          ]
+        },
+        "entry": {
+          "type": "string",
+          "description": "Entry name inside the pak, e.g. [scene]/ny_01_pvp.obb."
+        }
+      }
+    },
+    "coordinates": {
+      "type": "object",
+      "required": [
+        "units",
+        "up",
+        "handedness"
+      ],
+      "properties": {
+        "units": {
+          "const": "metres"
+        },
+        "up": {
+          "const": "+y"
+        },
+        "handedness": {
+          "enum": [
+            "unverified",
+            "left",
+            "right"
+          ]
+        }
+      }
+    },
+    "layers": {
+      "type": "object",
+      "required": [
+        "obb"
+      ],
+      "properties": {
+        "obb": {
+          "type": "object",
+          "description": "Oriented bounding boxes, grouped per object.",
+          "required": [
+            "group_count",
+            "box_count",
+            "boxes",
+            "groups",
+            "convention",
+            "center_bounds"
+          ],
+          "properties": {
+            "group_count": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "box_count": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "boxes": {
+              "type": "object",
+              "required": [
+                "uri",
+                "dtype",
+                "byte_order",
+                "components",
+                "layout"
+              ],
+              "properties": {
+                "uri": {
+                  "type": "string"
+                },
+                "dtype": {
+                  "const": "float32"
+                },
+                "byte_order": {
+                  "const": "little"
+                },
+                "components": {
+                  "const": 15
+                },
+                "layout": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "minItems": 15,
+                  "maxItems": 15
+                }
+              }
+            },
+            "groups": {
+              "type": "object",
+              "required": [
+                "uri",
+                "dtype",
+                "byte_order",
+                "components"
+              ],
+              "properties": {
+                "uri": {
+                  "type": "string"
+                },
+                "dtype": {
+                  "const": "uint32"
+                },
+                "byte_order": {
+                  "const": "little"
+                },
+                "components": {
+                  "const": 1
+                }
+              }
+            },
+            "convention": {
+              "type": "string"
+            },
+            "center_bounds": {
+              "type": "object",
+              "description": "Per-axis extremes and percentiles of box centres. Use p50 and the p10-p90 spread to find the playable area; the extremes include kilometres of distant scenery.",
+              "required": [
+                "min",
+                "max",
+                "p1",
+                "p10",
+                "p50",
+                "p90",
+                "p99"
+              ],
+              "properties": {
+                "min": {
+                  "$ref": "#/$defs/vec3"
+                },
+                "max": {
+                  "$ref": "#/$defs/vec3"
+                },
+                "p1": {
+                  "$ref": "#/$defs/vec3"
+                },
+                "p10": {
+                  "$ref": "#/$defs/vec3"
+                },
+                "p50": {
+                  "$ref": "#/$defs/vec3"
+                },
+                "p90": {
+                  "$ref": "#/$defs/vec3"
+                },
+                "p99": {
+                  "$ref": "#/$defs/vec3"
+                }
+              }
+            }
+          }
+        },
+        "geometry": {
+          "type": "object",
+          "description": "The level's real geometry (format 2), written when exporting with textures: one shared vertex buffer, triangles sorted by material, one group per material. Buffers are gzip files (*.bin.gz); the dev server sends them with Content-Encoding: gzip.",
+          "required": [
+            "format",
+            "vertex_count",
+            "triangle_count",
+            "attributes",
+            "indices",
+            "rgbm_range",
+            "groups",
+            "materials",
+            "lightmap",
+            "environment",
+            "textures",
+            "stats"
+          ],
+          "properties": {
+            "format": {
+              "const": 2
+            },
+            "vertex_count": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "triangle_count": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "attributes": {
+              "type": "object",
+              "description": "One buffer per vertex attribute.",
+              "required": [
+                "positions",
+                "normals",
+                "tangents",
+                "uvs",
+                "colours",
+                "rnm0",
+                "rnm1",
+                "rnm2",
+                "direct",
+                "direct_dir",
+                "lightmap_uvs"
+              ],
+              "properties": {
+                "positions": {
+                  "type": "object",
+                  "description": "World-space xyz, metres.",
+                  "required": [
+                    "uri",
+                    "dtype",
+                    "components",
+                    "byte_order"
+                  ],
+                  "properties": {
+                    "uri": {
+                      "type": "string"
+                    },
+                    "dtype": {
+                      "const": "float32"
+                    },
+                    "components": {
+                      "const": 3
+                    },
+                    "byte_order": {
+                      "const": "little"
+                    }
+                  }
+                },
+                "normals": {
+                  "type": "object",
+                  "description": "The game's normal, -127..127 for -1..1.",
+                  "required": [
+                    "uri",
+                    "dtype",
+                    "components"
+                  ],
+                  "properties": {
+                    "uri": {
+                      "type": "string"
+                    },
+                    "dtype": {
+                      "const": "int8"
+                    },
+                    "components": {
+                      "const": 3
+                    },
+                    "normalized": {
+                      "const": true
+                    }
+                  }
+                },
+                "tangents": {
+                  "type": "object",
+                  "description": "First tangent frame xyz and the bitangent sign (bitangent = normal x tangent x sign); zero when the draw has none.",
+                  "required": [
+                    "uri",
+                    "dtype",
+                    "components"
+                  ],
+                  "properties": {
+                    "uri": {
+                      "type": "string"
+                    },
+                    "dtype": {
+                      "const": "int8"
+                    },
+                    "components": {
+                      "const": 4
+                    },
+                    "normalized": {
+                      "const": true
+                    }
+                  }
+                },
+                "uvs": {
+                  "type": "object",
+                  "description": "UV set 0 without tiling (materials carry it); v runs down the texture.",
+                  "required": [
+                    "uri",
+                    "dtype",
+                    "components",
+                    "byte_order"
+                  ],
+                  "properties": {
+                    "uri": {
+                      "type": "string"
+                    },
+                    "dtype": {
+                      "const": "float32"
+                    },
+                    "components": {
+                      "const": 2
+                    },
+                    "byte_order": {
+                      "const": "little"
+                    },
+                    "v_down": {
+                      "const": true
+                    }
+                  }
+                },
+                "colours": {
+                  "type": "object",
+                  "description": "First vertex colour word: material layer blend weights.",
+                  "required": [
+                    "uri",
+                    "dtype",
+                    "components"
+                  ],
+                  "properties": {
+                    "uri": {
+                      "type": "string"
+                    },
+                    "dtype": {
+                      "const": "uint8"
+                    },
+                    "components": {
+                      "const": 4
+                    },
+                    "normalized": {
+                      "const": true
+                    }
+                  }
+                },
+                "uv_set1": {
+                  "type": "object",
+                  "description": "UV set 1, for layers that draw with it.",
+                  "required": [
+                    "uri",
+                    "dtype",
+                    "components",
+                    "byte_order"
+                  ],
+                  "properties": {
+                    "uri": {
+                      "type": "string"
+                    },
+                    "dtype": {
+                      "const": "float16"
+                    },
+                    "components": {
+                      "const": 2
+                    },
+                    "byte_order": {
+                      "const": "little"
+                    }
+                  }
+                },
+                "uv_set2": {
+                  "type": "object",
+                  "description": "UV set 2, for layers that draw with it.",
+                  "required": [
+                    "uri",
+                    "dtype",
+                    "components",
+                    "byte_order"
+                  ],
+                  "properties": {
+                    "uri": {
+                      "type": "string"
+                    },
+                    "dtype": {
+                      "const": "float16"
+                    },
+                    "components": {
+                      "const": 2
+                    },
+                    "byte_order": {
+                      "const": "little"
+                    }
+                  }
+                },
+                "uv_set3": {
+                  "type": "object",
+                  "description": "UV set 3, for layers that draw with it.",
+                  "required": [
+                    "uri",
+                    "dtype",
+                    "components",
+                    "byte_order"
+                  ],
+                  "properties": {
+                    "uri": {
+                      "type": "string"
+                    },
+                    "dtype": {
+                      "const": "float16"
+                    },
+                    "components": {
+                      "const": 2
+                    },
+                    "byte_order": {
+                      "const": "little"
+                    }
+                  }
+                },
+                "rnm0": {
+                  "type": "object",
+                  "description": "RGBM light along the bake's first basis direction (rgb * a * rgbm_range).",
+                  "required": [
+                    "uri",
+                    "dtype",
+                    "components"
+                  ],
+                  "properties": {
+                    "uri": {
+                      "type": "string"
+                    },
+                    "dtype": {
+                      "const": "uint8"
+                    },
+                    "components": {
+                      "const": 4
+                    },
+                    "normalized": {
+                      "const": true
+                    },
+                    "encoding": {
+                      "const": "rgbm"
+                    }
+                  }
+                },
+                "rnm1": {
+                  "type": "object",
+                  "description": "RGBM light along the second basis direction.",
+                  "required": [
+                    "uri",
+                    "dtype",
+                    "components"
+                  ],
+                  "properties": {
+                    "uri": {
+                      "type": "string"
+                    },
+                    "dtype": {
+                      "const": "uint8"
+                    },
+                    "components": {
+                      "const": 4
+                    },
+                    "normalized": {
+                      "const": true
+                    },
+                    "encoding": {
+                      "const": "rgbm"
+                    }
+                  }
+                },
+                "rnm2": {
+                  "type": "object",
+                  "description": "RGBM light along the third basis direction.",
+                  "required": [
+                    "uri",
+                    "dtype",
+                    "components"
+                  ],
+                  "properties": {
+                    "uri": {
+                      "type": "string"
+                    },
+                    "dtype": {
+                      "const": "uint8"
+                    },
+                    "components": {
+                      "const": 4
+                    },
+                    "normalized": {
+                      "const": true
+                    },
+                    "encoding": {
+                      "const": "rgbm"
+                    }
+                  }
+                },
+                "direct": {
+                  "type": "object",
+                  "description": "RGBM colour of the dominant direct light.",
+                  "required": [
+                    "uri",
+                    "dtype",
+                    "components"
+                  ],
+                  "properties": {
+                    "uri": {
+                      "type": "string"
+                    },
+                    "dtype": {
+                      "const": "uint8"
+                    },
+                    "components": {
+                      "const": 4
+                    },
+                    "normalized": {
+                      "const": true
+                    },
+                    "encoding": {
+                      "const": "rgbm"
+                    }
+                  }
+                },
+                "direct_dir": {
+                  "type": "object",
+                  "description": "World-space direction of the direct light, zero when there is none.",
+                  "required": [
+                    "uri",
+                    "dtype",
+                    "components"
+                  ],
+                  "properties": {
+                    "uri": {
+                      "type": "string"
+                    },
+                    "dtype": {
+                      "const": "int8"
+                    },
+                    "components": {
+                      "const": 4
+                    },
+                    "normalized": {
+                      "const": true
+                    }
+                  }
+                },
+                "lightmap_uvs": {
+                  "type": "object",
+                  "description": "Where lightmap-lit vertices sample the lightmap images, 0..65535 for 0..1.",
+                  "required": [
+                    "uri",
+                    "dtype",
+                    "components",
+                    "byte_order"
+                  ],
+                  "properties": {
+                    "uri": {
+                      "type": "string"
+                    },
+                    "dtype": {
+                      "const": "uint16"
+                    },
+                    "components": {
+                      "const": 2
+                    },
+                    "byte_order": {
+                      "const": "little"
+                    },
+                    "normalized": {
+                      "const": true
+                    }
+                  }
+                }
+              }
+            },
+            "indices": {
+              "type": "object",
+              "description": "Three vertex numbers per triangle.",
+              "required": [
+                "uri",
+                "dtype",
+                "components",
+                "byte_order"
+              ],
+              "properties": {
+                "uri": {
+                  "type": "string"
+                },
+                "dtype": {
+                  "const": "uint32"
+                },
+                "components": {
+                  "const": 3
+                },
+                "byte_order": {
+                  "const": "little"
+                }
+              }
+            },
+            "rgbm_range": {
+              "type": "number",
+              "minimum": 1,
+              "description": "RGBM multiplier: light = rgb * a * rgbm_range."
+            },
+            "groups": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": [
+                  "material",
+                  "first_triangle",
+                  "triangle_count"
+                ],
+                "properties": {
+                  "material": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "first_triangle": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "triangle_count": {
+                    "type": "integer",
+                    "minimum": 0
+                  }
+                }
+              }
+            },
+            "materials": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/material"
+              }
+            },
+            "lightmap": {
+              "description": "The lightmap atlas as PNG images (RGBM basis maps and direct colour, direction as rgb), or null when the map has none.",
+              "properties": {
+                "width": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "height": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "images": {
+                  "type": "object",
+                  "required": [
+                    "rnm0",
+                    "rnm1",
+                    "rnm2",
+                    "direct",
+                    "direct_dir"
+                  ],
+                  "properties": {
+                    "rnm0": {
+                      "type": "string"
+                    },
+                    "rnm1": {
+                      "type": "string"
+                    },
+                    "rnm2": {
+                      "type": "string"
+                    },
+                    "direct": {
+                      "type": "string"
+                    },
+                    "direct_dir": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            },
+            "environment": {
+              "description": "The map's most open-sky reflection probe as an equirectangular float16 RGBA image (row 0 looks down), or null.",
+              "properties": {
+                "uri": {
+                  "type": "string"
+                },
+                "dtype": {
+                  "const": "float16"
+                },
+                "components": {
+                  "const": 4
+                },
+                "byte_order": {
+                  "const": "little"
+                },
+                "width": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "height": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "projection": {
+                  "const": "equirectangular"
+                }
+              }
+            },
+            "textures": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "stats": {
+              "type": "object",
+              "description": "Decoding figures, for reports."
+            }
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "vec3": {
+      "type": "array",
+      "items": {
+        "type": "number"
+      },
+      "minItems": 3,
+      "maxItems": 3
+    },
+    "layer": {
+      "type": "object",
+      "description": "One material layer. Layer 0 is the base; later layers blend over it.",
+      "required": [
+        "texture",
+        "normal_map",
+        "tiling",
+        "uv_set",
+        "method",
+        "channel",
+        "use_alpha",
+        "multiplier",
+        "heightmap",
+        "softness",
+        "tint"
+      ],
+      "properties": {
+        "texture": {
+          "description": "Texture name, or null when there is none (or the game does not ship it)."
+        },
+        "normal_map": {
+          "description": "The texture's tangent-space normal map (BC5, x and y), or null."
+        },
+        "tiling": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          },
+          "minItems": 2,
+          "maxItems": 2
+        },
+        "uv_set": {
+          "enum": [
+            0,
+            1,
+            2,
+            3
+          ]
+        },
+        "method": {
+          "type": "string",
+          "description": "base (layer 0), common (mix) or dirt / dirt_no_spec (multiply x2)."
+        },
+        "channel": {
+          "type": "integer",
+          "description": "Vertex colour channel holding the layer's weight, -1 for none."
+        },
+        "use_alpha": {
+          "description": "True when the layer's texture alpha scales its weight."
+        },
+        "multiplier": {
+          "type": "number"
+        },
+        "heightmap": {
+          "description": "Heightmap that sharpens the blend edge, or null."
+        },
+        "softness": {
+          "type": "number"
+        },
+        "tint": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          },
+          "minItems": 4,
+          "maxItems": 4,
+          "description": "sRGB rgba multiplier, 0..1."
+        }
+      }
+    },
+    "material": {
+      "type": "object",
+      "required": [
+        "name",
+        "kind",
+        "alpha",
+        "lighting",
+        "layers",
+        "spec_map",
+        "emissive_map",
+        "texture",
+        "color",
+        "texture_size",
+        "lightmap",
+        "draws"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The material's main texture name."
+        },
+        "kind": {
+          "enum": [
+            "surface",
+            "blocker",
+            "sky",
+            "glow",
+            "water"
+          ],
+          "description": "blocker: invisible in-game; sky: unlit dome; glow: additive light effect; water: its texture is a normal map."
+        },
+        "alpha": {
+          "enum": [
+            "opaque",
+            "cutout",
+            "blend"
+          ]
+        },
+        "lighting": {
+          "enum": [
+            "vertex",
+            "lightmap",
+            "probe",
+            "none"
+          ],
+          "description": "vertex: rnm/direct buffers; lightmap: the lightmap images; probe: light probes (in the rnm buffers); none: unlit."
+        },
+        "layers": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/layer"
+          },
+          "minItems": 1,
+          "maxItems": 4
+        },
+        "spec_map": {
+          "description": "Specular mask (reflection strength), or null."
+        },
+        "emissive_map": {
+          "description": "Emissive colour map, or null (also when the material variant has its lights off)."
+        },
+        "texture": {
+          "description": "Texture name, or null when there is none (or the game does not ship it)."
+        },
+        "color": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "minItems": 3,
+          "maxItems": 3,
+          "description": "Average texture colour, for the untextured view."
+        },
+        "texture_size": {
+          "description": "[width, height] in pixels, or null."
+        },
+        "lightmap": {
+          "description": "True when lit by the lightmap images."
+        },
+        "draws": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    }
+  }
+}

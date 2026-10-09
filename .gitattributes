@@ -1,0 +1,2 @@
+# Batch files need Windows line endings (cmd mis-reads labels otherwise): store them as they are.
+*.bat -text

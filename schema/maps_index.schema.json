@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "wwz-mapviewer/maps_index",
+  "title": "List of exported maps (maps/index.json)",
+  "type": "object",
+  "required": [
+    "schema",
+    "schema_version",
+    "maps"
+  ],
+  "properties": {
+    "schema": {
+      "const": "wwz-mapviewer/maps_index"
+    },
+    "schema_version": {
+      "const": 1
+    },
+    "maps": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "map",
+          "path",
+          "box_count",
+          "group_count"
+        ],
+        "properties": {
+          "map": {
+            "type": "string"
+          },
+          "path": {
+            "type": "string",
+            "description": "Manifest path relative to the maps folder."
+          },
+          "box_count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "group_count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "triangle_count": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Real-geometry triangles exported (0 when only boxes were exported)."
+          }
+        }
+      }
+    }
+  }
+}

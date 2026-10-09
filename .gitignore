@@ -1,0 +1,19 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.venv/
+
+# Local machine configuration (copy config/paths.example.toml)
+config/paths.toml
+
+# Extracted and exported game data never goes into version control
+output/
+
+# The website build (build_site.py) is published to the gh-pages branch, not kept here
+site/
+
+# Windows shortcuts and local assistant settings
+*.lnk
+.claude/
