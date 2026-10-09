@@ -23,7 +23,8 @@ The map buffers stay gzip files; GitHub Pages sends them as they are and the
 viewer inflates them itself. GitHub refuses files over 100 MB and serves sites
 up to 1 GB, which the build checks. ``--publish`` commits the folder to the
 ``gh-pages`` branch of the given repository (replacing what was there) and
-pushes it with your own git login; turn on Pages for that branch once, in the
+pushes it with your own git login (the branch history is kept in ``site/.git``,
+so an update uploads only what changed); turn on Pages for that branch once, in the
 repository's Settings > Pages.
 
 The maps and textures are made from the game's files, which belong to their
@@ -139,11 +140,21 @@ def _check_sizes(out: Path) -> int:
 
 def build(out: Path, maps: list[str], repository: str) -> int:
     """Build the site into ``out`` (replacing an earlier build there); returns its size in bytes."""
+    kept_history = None
     if out.exists():
-        if not (out / "viewer" / "index.html").is_file() or SITE_MARKER not in (out / "viewer" / "index.html").read_text(encoding="utf-8"):
+        page = out / "viewer" / "index.html"
+        if not page.is_file() or SITE_MARKER not in page.read_text(encoding="utf-8"):
             raise SiteError(f"{out} exists and is not an earlier website build; choose another --out")
+        # Keep the published history (see publish), so an update uploads only what changed.
+        if (out / ".git").is_dir():
+            kept_history = out.parent / f".{out.name}-git-kept"
+            if kept_history.exists():
+                raise SiteError(f"{kept_history} is left over from an interrupted build; move it back to {out / '.git'}")
+            (out / ".git").rename(kept_history)
         shutil.rmtree(out)
     out.mkdir(parents=True)
+    if kept_history is not None:
+        kept_history.rename(out / ".git")
     _copy_viewer(out, repository)
     textures = _copy_maps(out, maps)
     missing = _write_textures(out, textures)
@@ -166,18 +177,24 @@ DEFAULT_MESSAGE = "Website build of the WWZ Map Viewer"
 
 
 def publish(out: Path, remote: str, message: str = DEFAULT_MESSAGE) -> None:
-    """Commit the built site as the only commit of ``gh-pages`` and push it, replacing the branch."""
+    """Commit the built site to ``gh-pages`` and push it, replacing the branch on the remote.
+
+    The branch's history lives in ``out/.git`` and is kept from build to build, so
+    an update commits on top of the last published site and the push uploads only
+    the files that changed (a first publish uploads everything).
+    """
     identity = []
     for key in ("user.name", "user.email"):
         value = subprocess.run(["git", "config", key], cwd=ROOT, capture_output=True, text=True).stdout.strip()
         if value:
             identity += ["-c", f"{key}={value}"]
-    if (out / ".git").exists():
-        shutil.rmtree(out / ".git")
-    _git("init", "--quiet", cwd=out)
-    _git("checkout", "--quiet", "-b", PAGES_BRANCH, cwd=out)
+    if not (out / ".git").is_dir():
+        _git("init", "--quiet", cwd=out)
+        _git("checkout", "--quiet", "-b", PAGES_BRANCH, cwd=out)
     _git("add", "--all", cwd=out)
-    _git(*identity, "commit", "--quiet", "-m", message, cwd=out)
+    unchanged = subprocess.run(["git", "diff", "--cached", "--quiet"], cwd=out).returncode == 0
+    if not unchanged:
+        _git(*identity, "commit", "--quiet", "-m", message, cwd=out)
     _git("push", "--force", remote, f"{PAGES_BRANCH}:{PAGES_BRANCH}", cwd=out)
 
 

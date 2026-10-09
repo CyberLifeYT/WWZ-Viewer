@@ -42,6 +42,20 @@ def test_a_site_without_maps_is_the_viewer_told_it_runs_as_a_website(tmp_path: P
     assert (other / "viewer" / "index.html").is_file()
 
 
+def test_a_rebuild_keeps_the_published_history(tmp_path: Path) -> None:
+    # The gh-pages history lives in site/.git; keeping it means an update uploads only what changed.
+    site = load_build_site()
+    out = tmp_path / "site"
+    site.build(out, [], "x")
+    (out / ".git").mkdir()
+    (out / ".git" / "HEAD").write_text("ref: refs/heads/gh-pages\n", encoding="utf-8")
+    (out / "stale.txt").write_text("from an older build", encoding="utf-8")
+    site.build(out, [], "x")
+    assert (out / ".git" / "HEAD").read_text(encoding="utf-8") == "ref: refs/heads/gh-pages\n"
+    assert not (out / "stale.txt").exists()
+    assert not list(tmp_path.glob(".site-git-kept*"))
+
+
 def test_every_texture_a_map_uses_is_collected() -> None:
     site = load_build_site()
     manifest = {
