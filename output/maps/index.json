@@ -1,0 +1,41 @@
+{
+  "schema": "wwz-mapviewer/maps_index",
+  "schema_version": 1,
+  "maps": [
+    {
+      "map": "camp_01_pvp",
+      "path": "camp_01_pvp/map_data.json",
+      "box_count": 42093,
+      "group_count": 5884,
+      "triangle_count": 4907976
+    },
+    {
+      "map": "jer_01_pvp",
+      "path": "jer_01_pvp/map_data.json",
+      "box_count": 24967,
+      "group_count": 4294,
+      "triangle_count": 3700039
+    },
+    {
+      "map": "jer_02_pvp",
+      "path": "jer_02_pvp/map_data.json",
+      "box_count": 19329,
+      "group_count": 2809,
+      "triangle_count": 2530339
+    },
+    {
+      "map": "mos_01_pvp",
+      "path": "mos_01_pvp/map_data.json",
+      "box_count": 39169,
+      "group_count": 5908,
+      "triangle_count": 4923191
+    },
+    {
+      "map": "ny_01_pvp",
+      "path": "ny_01_pvp/map_data.json",
+      "box_count": 52524,
+      "group_count": 7494,
+      "triangle_count": 3835604
+    }
+  ]
+}

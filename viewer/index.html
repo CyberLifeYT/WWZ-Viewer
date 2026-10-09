@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>WWZ Map Viewer</title>
+    <link rel="stylesheet" href="css/viewer.css" />
+    <script type="importmap">
+      { "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js" } }
+    </script>
+  </head>
+  <body>
+    <canvas id="viewport" aria-label="3D map view. Click to fly."></canvas>
+
+    <div id="crosshair" hidden></div>
+
+    <div id="prompt">
+      <p class="prompt-title">Click the map to fly</p>
+      <dl class="keys">
+        <dt>Mouse</dt><dd>look around</dd>
+        <dt>W A S D</dt><dd>fly where you look</dd>
+        <dt>Space / Shift</dt><dd>up / down</dd>
+        <dt>Wheel</dt><dd>change speed</dd>
+        <dt>F</dt><dd>identify the surface at the crosshair</dd>
+        <dt>R</dt><dd>reset the view</dd>
+        <dt>Esc</dt><dd>release the mouse</dd>
+      </dl>
+    </div>
+
+    <aside id="panel">
+      <h1>WWZ Map Viewer</h1>
+      <label class="field">
+        <span>Map</span>
+        <select id="map-select"></select>
+      </label>
+      <label class="check"><input id="show-geometry" type="checkbox" checked /> Real geometry</label>
+      <label class="check"><input id="show-textures" type="checkbox" checked /> Game textures</label>
+      <label class="check"><input id="show-baked" type="checkbox" checked /> Game lighting (baked)</label>
+      <label class="check"><input id="auto-exposure" type="checkbox" checked /> Auto exposure (eye adaptation)</label>
+      <label class="field">
+        <span>Exposure <output id="exposure-value"></output></span>
+        <input id="exposure" type="range" min="0.25" max="4" step="0.05" value="1" />
+      </label>
+      <label class="check"><input id="show-placeholders" type="checkbox" /> Invisible blockers</label>
+      <label class="check"><input id="show-boxes" type="checkbox" /> Bounding boxes</label>
+      <label class="field">
+        <span>Box colour</span>
+        <select id="color-mode">
+          <option value="group">By object group</option>
+          <option value="height">By height</option>
+        </select>
+      </label>
+      <label class="field">
+        <span>Hide boxes longer than <output id="max-size-value"></output></span>
+        <input id="max-size" type="range" min="0" max="100" step="1" value="67" />
+      </label>
+      <label class="check"><input id="wireframe" type="checkbox" /> Wireframe</label>
+      <label class="check"><input id="grid" type="checkbox" /> Ground grid at y = 0</label>
+      <label class="check"><input id="mirror" type="checkbox" /> Mirror X (handedness test)</label>
+      <p id="stats"></p>
+      <p id="status" role="status"></p>
+      <details id="gallery">
+        <summary>Textures in this map <span id="gallery-count"></span></summary>
+        <p class="gallery-note">Decoded live from the game's own texture files.</p>
+        <div id="gallery-grid"></div>
+      </details>
+    </aside>
+
+    <section id="hud">
+      <div><span class="label">pos  </span><span id="hud-position"></span></div>
+      <div><span class="label">view </span><span id="hud-view"></span></div>
+      <div><span class="label">speed</span> <span id="hud-speed"></span>  <span class="label">fps</span> <span id="hud-fps"></span></div>
+      <div id="hud-pick" hidden><span id="hud-pick-text"></span><img id="hud-texture" alt="" hidden /></div>
+    </section>
+
+    <!-- website build -->
+    <script>window.WWZ_SITE = {"textures": "../textures/", "textureFormat": "webp", "repository": "https://github.com/CyberLifeYT/WWZ-Viewer"};</script>
+    <script type="module" src="js/main.js"></script>
+  </body>
+</html>

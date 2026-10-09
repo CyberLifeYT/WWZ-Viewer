@@ -1,0 +1,258 @@
+:root {
+  --bg: #1b2026;
+  --surface: rgba(19, 23, 29, 0.9);
+  --field: #252b33;
+  --border: rgba(255, 255, 255, 0.09);
+  --text: #e3e7ec;
+  --muted: #8f99a6;
+  --accent: #e0a458;
+  --error: #ff7b72;
+  --font: system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: ui-monospace, "Cascadia Mono", Consolas, monospace;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--text);
+  font: 13px/1.45 var(--font);
+}
+
+[hidden] {
+  display: none !important;
+}
+
+#viewport {
+  position: fixed;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  cursor: crosshair;
+}
+
+/* -- side panel ------------------------------------------------------------------- */
+
+#panel {
+  position: fixed;
+  top: 12px;
+  right: 12px;
+  width: 280px;
+  max-height: calc(100% - 24px);
+  overflow: auto;
+  padding: 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+#panel h1 {
+  margin: 0 0 12px;
+  font-size: 14px;
+  letter-spacing: 0.02em;
+}
+
+.field {
+  display: grid;
+  gap: 4px;
+  margin-bottom: 10px;
+}
+
+.field > span {
+  color: var(--muted);
+}
+
+.field output {
+  color: var(--text);
+}
+
+select {
+  width: 100%;
+  padding: 4px 6px;
+  background: var(--field);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font: inherit;
+}
+
+input[type="range"] {
+  width: 100%;
+  accent-color: var(--accent);
+}
+
+.check {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin: 6px 0;
+}
+
+.check input {
+  accent-color: var(--accent);
+}
+
+#stats {
+  margin: 12px 0 0;
+  color: var(--muted);
+  font: 12px/1.5 var(--mono);
+  white-space: pre-line;
+}
+
+#status {
+  margin: 6px 0 0;
+}
+
+#status.error {
+  color: var(--error);
+}
+
+/* -- texture gallery ---------------------------------------------------------------- */
+
+#gallery {
+  margin-top: 12px;
+  border-top: 1px solid var(--border);
+  padding-top: 8px;
+}
+
+#gallery summary {
+  cursor: pointer;
+  color: var(--text);
+}
+
+.gallery-note {
+  margin: 6px 0;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+#gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+}
+
+.gallery-item {
+  display: block;
+  color: var(--muted);
+  font-size: 10px;
+  text-decoration: none;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.gallery-item img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+  background: var(--field);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+}
+
+/* -- heads-up display ------------------------------------------------------------- */
+
+#hud {
+  position: fixed;
+  left: 12px;
+  bottom: 12px;
+  padding: 8px 10px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font: 12px/1.6 var(--mono);
+  pointer-events: none;
+}
+
+/* Preserve the padding inside readouts, but not the markup's own line breaks. */
+#hud > div,
+#hud span {
+  white-space: pre;
+}
+
+#hud .label {
+  color: var(--muted);
+}
+
+#hud-pick {
+  margin-top: 4px;
+  padding-top: 4px;
+  border-top: 1px solid var(--border);
+  color: var(--accent);
+}
+
+#hud-texture {
+  display: block;
+  width: 160px;
+  height: 160px;
+  margin-top: 6px;
+  object-fit: contain;
+  background: repeating-conic-gradient(#3a414b 0% 25%, #2b3139 0% 50%) 0 0 / 16px 16px;
+  border: 1px solid var(--border);
+}
+
+/* -- fly prompt and crosshair ----------------------------------------------------- */
+
+#prompt {
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  padding: 16px 20px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  pointer-events: none; /* clicks reach the canvas underneath */
+}
+
+.prompt-title {
+  margin: 0 0 8px;
+  font-weight: 600;
+}
+
+.keys {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 2px 16px;
+  margin: 0;
+}
+
+.keys dt {
+  color: var(--accent);
+  font-family: var(--mono);
+}
+
+.keys dd {
+  margin: 0;
+  color: var(--muted);
+}
+
+#crosshair {
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  width: 6px;
+  height: 6px;
+  margin: -3px 0 0 -3px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.85);
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.6);
+  pointer-events: none;
+}
+
+@media (max-width: 640px) {
+  #panel {
+    left: 12px;
+    width: auto;
+    max-height: 45%;
+  }
+}
