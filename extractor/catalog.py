@@ -71,8 +71,8 @@ class Catalog:
         if not client_dir.is_dir():
             raise CatalogError(f"{self.content_dir} has no client/ folder")
 
-        client = {path.stem: path for path in client_dir.glob("*.pak")}
-        server = {path.stem: path for path in server_dir.glob("*.pak")} if server_dir.is_dir() else {}
+        client = {path.stem: path for path in client_dir.glob("**/*.pak")}
+        server = {path.stem: path for path in server_dir.glob("**/*.pak")} if server_dir.is_dir() else {}
 
         self._groups: dict[str, PakGroupInfo] = {}
         for name in sorted(client.keys() | server.keys()):
